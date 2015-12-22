@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{80504791-5956-41E3-8664-047222C6DA20}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="TestApp.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="PropertiesPageComponent.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="TestApp">
+        <MSBuild Projects="TestApp.dproj"/>
+    </Target>
+    <Target Name="TestApp:Clean">
+        <MSBuild Projects="TestApp.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="TestApp:Make">
+        <MSBuild Projects="TestApp.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="PropertiesPageComponent">
+        <MSBuild Projects="PropertiesPageComponent.dproj"/>
+    </Target>
+    <Target Name="PropertiesPageComponent:Clean">
+        <MSBuild Projects="PropertiesPageComponent.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PropertiesPageComponent:Make">
+        <MSBuild Projects="PropertiesPageComponent.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="TestApp;PropertiesPageComponent"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="TestApp:Clean;PropertiesPageComponent:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="TestApp:Make;PropertiesPageComponent:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

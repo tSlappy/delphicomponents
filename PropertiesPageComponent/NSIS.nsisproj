@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup>
+		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+		<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+		<ProductVersion>1.0</ProductVersion>
+		<SchemaVersion>2.0</SchemaVersion>
+		<ProjectGuid>{2fe5c0e2-747c-4c92-b813-8feca9ab6ca0}</ProjectGuid>
+		<AssemblyName>NSIS Project1</AssemblyName>
+		<Name>NSIS Project1</Name>
+		<RootNamespace>NSIS Project1</RootNamespace>
+		<CompilerNoCD>/NOCD </CompilerNoCD>
+		<CompilerNoConfig>/NOCONFIG </CompilerNoConfig>
+		<CompilerPriority>/P2 </CompilerPriority>
+		<CompilerRaw>/RAW </CompilerRaw>
+		<UserSymbolsDefine>/Ddefine </UserSymbolsDefine>
+		<UserSymbolsExecute>/Xexecute </UserSymbolsExecute>
+		<LaunchToolBeforeBuild>before</LaunchToolBeforeBuild>
+		<LaunchToolAfterBuild>after</LaunchToolAfterBuild>
+		<RunInstaller>Yes</RunInstaller>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+		<OutputPath>
+		</OutputPath>
+		<CompilerPriority>/P2 </CompilerPriority><RunInstaller>Yes</RunInstaller></PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+		<OutputPath>
+		</OutputPath>
+		<CompilerPriority>/P3 </CompilerPriority><RunInstaller>Yes</RunInstaller></PropertyGroup>
+	<PropertyGroup>
+		<PreBuildEvent>
+		</PreBuildEvent>
+		<PostBuildEvent>
+		</PostBuildEvent>
+	</PropertyGroup>
+	<ItemGroup>
+		<Compile Include="Script.nsi">
+		</Compile>
+	</ItemGroup>
+	<Import Project="$(MSBuildExtensionsPath)\RADInstaller\NSISProject.targets"/>
+</Project>
