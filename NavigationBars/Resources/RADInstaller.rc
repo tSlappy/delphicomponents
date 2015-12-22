@@ -1,0 +1,63 @@
+////////////////////////////////////////////////////////////////////////////////
+// Unused
+RADInstallerIcon 2 RADInstallerIcon.bmp
+
+// R&I Menu icons
+RADInstallerManual 2 RADInstallerManual.bmp
+RADInstallerWebsite 2 RADInstallerWebsite.bmp
+RADInstallerTipOfTheDay 2 RADInstallerTipOfTheDay.bmp
+RADInstallerReportBug 2 RADInstallerReportBug.bmp
+RADInstallerSettings 2 RADInstallerSettings.bmp
+RADInstallerAbout 2 RADInstallerAbout.bmp
+
+// NSIS/Inno GIW menu icons
+GiwConfigure 2 GiwConfigure.bmp
+GiwWizard 2 GiwWizard.bmp
+GiwBitmapCutter 2 GiwBitmapCutter.bmp
+GiwUserManual 2 GiwUserManual.bmp
+GiwWebsite 2 GiwWebsite.bmp
+GiwAbout 2 GiwAbout.bmp
+
+// New Project - PROJECT Templates
+ProjectDLLTemplate RCDATA ProjectDLLTemplate.dpr
+ProjectPackageTemplate RCDATA ProjectPackageTemplate.dpk
+ProjectProgramTemplate RCDATA ProjectProgramTemplate.dpr
+ProjectCppFile RCDATA ProjectCppFile.cpp
+////////////////////////////////////////////////////////////////////////////////
+
+// Splash picture 24x24
+InnoSetupSplash 2 InnoSetupSplash.bmp
+// Repository wizard icons 16x16, 24x24, 32x32, 48x48
+InnoSetupIcon ICON InnoSetup.ico
+
+////////////////////////////////////////////////////////////////////////////////
+// New Project - Inno Setup resources
+InnoSetupScriptTemplate RCDATA InnoSetup\Script.iss
+InnoSetupProjectTemplate RCDATA InnoSetup\InnoSetupProject.innoproj
+InnoSetupBatchTemplate RCDATA InnoSetup\compilesetup.bat
+
+// Inno Setup general
+InnoSetupIntelliSenseIcons BITMAP InnoSetup\IntelliSenseIcons.bmp
+InnoSetupIntelliSense RCDATA InnoSetup\IntelliSense.dat
+InnoSetupTObjects RCDATA InnoSetup\TObjects.dat
+InnoSetupTTypes RCDATA InnoSetup\TTypes.dat
+InnoSetupKeywords RCDATA InnoSetup\InnoSetupKeywords.map
+InnoSetupisxfunc RCDATA InnoSetup\isxfunc.xml
+////////////////////////////////////////////////////////////////////////////////
+
+// Splash picture 24x24
+NSISSplash 2 NSISSplash.bmp
+// Repository wizard icons 16x16, 24x24, 32x32, 48x48
+NSISIcon ICON NSIS.ico
+
+////////////////////////////////////////////////////////////////////////////////
+// New Project - NSIS resources
+NSISScriptTemplate RCDATA NSIS\Script.nsi
+NSISProjectTemplate RCDATA NSIS\NSISProject.nsisproj
+NSISBatchTemplate RCDATA NSIS\compilesetup.bat
+
+// NSIS general
+NsisIntelliSenseIcons BITMAP Nsis\IntelliSenseIcons.bmp
+NsisIntelliSense RCDATA Nsis\IntelliSense.dat
+NsisKeywords RCDATA Nsis\NsisKeywords.map
+////////////////////////////////////////////////////////////////////////////////
