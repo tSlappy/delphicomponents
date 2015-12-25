@@ -97,6 +97,7 @@ type
     procedure MouseUp(Button: TMouseButton;  Shift: TShiftState; X, Y: Integer); override;
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure DblClick; override;
+    procedure WheelScroll(Sender: TObject; Direction: TWheelScrollDirection);
     procedure CreateParams(var Params: TCreateParams); override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -274,6 +275,7 @@ begin
   EdControl.BorderStyle := bsNone;
   EdControl.Parent := Self;
   EdControl.Visible := False;
+  EdControl.OnWheelScroll := WheelScroll;
   { Button control }
   BtnControl := TBtnControl.Create(Self);
   BtnControl.Parent := Self;
@@ -606,7 +608,7 @@ var
   charDelimiter : Char;
   strArray  : TStrings;
   Temp: String;
-  I: Integer;
+  I, SelIndex: Integer;
 
 begin
   PPED := Pointer(Items.Objects[ItemIndex]);
@@ -626,6 +628,12 @@ begin
       EdControl.Height := EditRect.Bottom - EditRect.Top;
       Edithit := Time;
       EdControl.Visible := True;
+      // ComboBox (ListBox)
+      if(PPED^.Typ = piCombo) then
+        EdControl.ReadOnly := True
+      else
+        EdControl.ReadOnly := False;
+
       MapWindowPoints(Handle, EdControl.Handle, P, 1);
       PostMessage(EdControl.Handle, WM_LButtonDown, MK_LButton, P.Y shl 16 + P.X);
       FOnDetailsCallback(PPED^.Name, PPED^.Description);
@@ -647,15 +655,22 @@ begin
       charDelimiter := '|';
       Temp := PPED^.Possible;
       strArray := StringUtils_SplitString(Temp, charDelimiter);
+      SelIndex := 0;
 
       for I := 0 to strArray.Count - 1 do
+      begin
         LbxControl.Items.Add(strArray[I]);
+        if(strArray[I] = PPED^.Value) then
+          SelIndex := I;
+      end;
 
       if LbxControl.Items.Count > 6 then
         LbxControl.Height := 4 + LbxControl.ItemHeight *  6
       else
         LbxControl.Height := 4 + LbxControl.ItemHeight * LbxControl.Items.Count;
-     LbxControl.SetFocus;
+
+      LbxControl.Selected[SelIndex] := True;
+      LbxControl.SetFocus;
     End;
 
     if(x < Halfway) then
@@ -748,6 +763,55 @@ begin
     Key := 0;
   End;
 end;
+
+procedure TPropertiesPage.WheelScroll(Sender: TObject; Direction: TWheelScrollDirection);
+var
+  P: TPoint;
+  PPED: PPropEditData;
+  charDelimiter : Char;
+  strArray  : TStrings;
+  Temp: String;
+  I, SelIndex: Integer;
+
+begin
+  PPED := Pointer(Items.Objects[ItemIndex]);
+
+  if((PPED^.Kind <> peItem) Or (PPED^.Typ <> piCombo)) then
+    Exit;
+
+  // Simulate clicking the arrow (show listbox items)
+  LbxControl.Visible := True;
+  EdControl.Visible := False;
+  BtnControl.Visible := False;
+  CBDown := True;
+  LbxControl.Items.Clear;
+  FOnDetailsCallback(PPED^.Name, PPED^.Description);
+
+  LbxControl.Top := EditRect.Bottom;
+  LbxControl.Left := EditRect.Left;
+  LbxControl.Width := ComboButtonBox.Right-EditRect.Left;
+
+  charDelimiter := '|';
+  Temp := PPED^.Possible;
+  strArray := StringUtils_SplitString(Temp, charDelimiter);
+
+  SelIndex := 0;
+  for I := 0 to strArray.Count - 1 do
+  begin
+    LbxControl.Items.Add(strArray[I]);
+    if(strArray[I] = PPED^.Value) then
+      SelIndex := I;
+  end;
+
+  if LbxControl.Items.Count > 6 then
+    LbxControl.Height := 4 + LbxControl.ItemHeight *  6
+  else
+    LbxControl.Height := 4 + LbxControl.ItemHeight * LbxControl.Items.Count;
+
+  LbxControl.Selected[SelIndex] := True;
+  LbxControl.SetFocus;
+end;
+
 
 procedure Register;
 begin

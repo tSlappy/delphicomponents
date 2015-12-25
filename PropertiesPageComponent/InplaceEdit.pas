@@ -178,15 +178,22 @@ type
   TGoingOffEvent = procedure(Sender: TObject; Reason: TGoingOffReason;
     Value: string; var AllowExit: Boolean) of object;
 
+  TWheelScrollDirection = (wsUp, wsDown);
+
+  TWheelScrollEvent = procedure(Sender: TObject; Direction: TWheelScrollDirection) of object;
+
   TInplaceEdit = class(TEdit)
   private
     FOnGoingOff : TGoingOffEvent;
     FRequireNotification : Boolean;
+    FOnWheelScroll: TWheelScrollEvent;
 
   protected
     procedure CNkeydown(var Message: TWMkeydown); message CN_KEYDOWN;
     Procedure CMEnter( Var Message : TCMEnter );   message CM_ENTER;
     Procedure CMExit( Var Message : TCMExit );   message CM_EXIT;
+    Procedure CMMouseWheel(var Message: TCMMouseWheel); message CM_MOUSEWHEEL;
+
     procedure TriggerGoingOffEvent(Reason: TGoingOffReason;
                                    Value: string; var AllowExit: Boolean); virtual;
   public
@@ -243,7 +250,8 @@ type
     Property OnMouseDown;
     Property OnMouseMove;
     Property OnMouseUp;
-    Property OnGoingOff : TGoingOffEvent read FOnGoingOff write FOnGoingOff ;
+    Property OnGoingOff: TGoingOffEvent read FOnGoingOff write FOnGoingOff;
+    Property OnWheelScroll: TWheelScrollEvent read FOnWheelScroll write FOnWheelScroll;
 end;
 
 procedure Register;
@@ -255,7 +263,7 @@ implementation
 procedure Register;
 {--------------------------------------------------------------------------}
 begin
-  RegisterComponents('Standard',[TInplaceEdit]);
+  RegisterComponents('unSigned', [TInplaceEdit]);
 end;
 
 {--------------------------------------------------------------------------}
@@ -401,6 +409,22 @@ Begin
   Inherited;
   FRequireNotification := True;
 End;
+
+procedure TInplaceEdit.CMMouseWheel(var Message: TCMMouseWheel);
+var
+  ScrollCount, ScrollLines: integer;
+begin
+  SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, @ScrollLines, 0);
+  ScrollCount := 1 * ScrollLines * Message.WheelDelta div WHEEL_DELTA;
+
+  if Assigned(FOnWheelScroll) then
+  begin
+    if(ScrollCount > 0) then
+      FOnWheelScroll(Self, wsUp)
+    else
+      FOnWheelScroll(Self, wsDown);
+  end;
+end;
 
 end.
 
