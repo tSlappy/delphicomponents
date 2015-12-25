@@ -48,7 +48,10 @@ type
     mCurrentFile: String;
     mShowNavBars: Boolean;
 
-    procedure CreateControls();
+    procedure CreateControls;
+    procedure OnListHideTypes(Sender: TObject);
+    procedure OnListHideMembers(Sender: TObject);
+
   end;
 
 implementation
@@ -81,17 +84,47 @@ begin
 end;
 
 procedure TNavigationBarsDockableForm.SpeedButtonMembersClick(Sender: TObject);
+var
+  Bitmap: TBitmap;
 begin
-  inherited;
+  Bitmap := TBitmap.Create;
+  ImageListIcons.GetBitmap(1, Bitmap);
+  SpeedButtonMembers.Glyph := Bitmap;
+  Bitmap.Free;
 
   AutoCompleteEditMembers.ShowAllItems;
 end;
 
 procedure TNavigationBarsDockableForm.SpeedButtonTypesClick(Sender: TObject);
+var
+  Bitmap: TBitmap;
 begin
-  inherited;
+  Bitmap := TBitmap.Create;
+  ImageListIcons.GetBitmap(1, Bitmap);
+  SpeedButtonTypes.Glyph := Bitmap;
+  Bitmap.Free;
 
   AutoCompleteEditTypes.ShowAllItems;
+end;
+
+procedure TNavigationBarsDockableForm.OnListHideTypes(Sender: TObject);
+var
+  Bitmap: TBitmap;
+begin
+  Bitmap := TBitmap.Create;
+  ImageListIcons.GetBitmap(0, Bitmap);
+  SpeedButtonTypes.Glyph := Bitmap;
+  Bitmap.Free;
+end;
+
+procedure TNavigationBarsDockableForm.OnListHideMembers(Sender: TObject);
+var
+  Bitmap: TBitmap;
+begin
+  Bitmap := TBitmap.Create;
+  ImageListIcons.GetBitmap(0, Bitmap);
+  SpeedButtonMembers.Glyph := Bitmap;
+  Bitmap.Free;
 end;
 
 procedure TNavigationBarsDockableForm.FormCreate(Sender: TObject);
@@ -106,7 +139,7 @@ begin
   ImageListIcons.GetBitmap(0, SpeedButtonMembers.Glyph);
 end;
 
-procedure TNavigationBarsDockableForm.CreateControls();
+procedure TNavigationBarsDockableForm.CreateControls;
 const
   ECM_FIRST = $1500;
   EM_SETCUEBANNER = ECM_FIRST + 1;
@@ -119,6 +152,7 @@ begin
   AutocompleteEditTypes.Left := coControlsLeftTop;
   AutocompleteEditTypes.Top := coControlsLeftTop;
   SendMessage(AutocompleteEditTypes.Handle, EM_SETCUEBANNER, 0, LParam(PWideChar(WideString('Types: Alt + T'))));
+  AutocompleteEditTypes.OnListHide := OnListHideTypes;
 
   AutocompleteEditMembers := TAutoCompleteEdit.Create(Self, 'Members: Alt + M');
   AutocompleteEditMembers.Parent := Self;
@@ -126,6 +160,7 @@ begin
   AutocompleteEditMembers.Left := 100;
   AutocompleteEditMembers.Top := coControlsLeftTop;
   SendMessage(AutocompleteEditMembers.Handle, EM_SETCUEBANNER, 0, LParam(PWideChar(WideString('Members: Alt + M'))));
+  AutocompleteEditMembers.OnListHide := OnListHideMembers;
 
   mShowNavBars := True;
 

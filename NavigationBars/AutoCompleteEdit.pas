@@ -19,6 +19,9 @@ const
   coImagePadding  = 1;
 
 type
+
+  TListHideEvent = procedure(Sender: TObject) of object;
+
   TAutoCompleteMan = class
   private
     FMembers: TList<TDropDownMember>;
@@ -52,6 +55,8 @@ type
     FBitmapsCount: Integer;
 
     FCanvas: TCanvas;
+    FOnListHide: TListHideEvent;
+
     procedure WMPaint(var Message: TWMPaint); message WM_PAINT;
 
     procedure HandleWordListLostFocus(ASender: TObject);
@@ -144,6 +149,8 @@ type
    property OnMouseUp;
    property OnStartDock;
    property OnStartDrag;
+
+   property OnListHide: TListHideEvent read FOnListHide write FOnListHide;
   end;
 
 
@@ -313,6 +320,9 @@ begin
     FPopupForm.Free;
     FPopupForm := nil;
   end;
+
+  if Assigned(FOnListHide) then
+    FOnListHide(Self)
 end;
 
 procedure TAutoCompleteEdit.HandleWordListKeyDown(ASender: TObject; var Key: Word; Shift: TShiftState);
@@ -470,6 +480,16 @@ end;
 
 procedure TAutoCompleteEdit.ShowAllItems;
 begin
+  // If the list is visible hide it
+  if(FItemsList <> nil) then
+  begin
+    if(FItemsList.Visible) then
+    begin
+      PostMessage(Self.Handle, MSG_HIDEWORDLIST, 0, 0);
+      Exit;
+    end;
+  end;
+
   if(Self.Text = '') then
     Self.Text := '#';
 
@@ -582,9 +602,12 @@ end;
 
 procedure TAutoCompleteEdit.WMPaint(var Message: TWMPaint);
 begin
- ControlState := ControlState + [csCustomPaint];
- inherited;
- ControlState := ControlState - [csCustomPaint];
+  // Do not use ownerdraw if nothing is selected
+  if(FSelected <> nil) then
+    ControlState := ControlState + [csCustomPaint];
+  inherited;
+  if(FSelected <> nil) then
+    ControlState := ControlState - [csCustomPaint];
 end;
 
 procedure TAutoCompleteEdit.DrawTransparentBmp(Cnv: TCanvas; x,y: Integer; Bmp: TBitmap; clTransparent: TColor);
