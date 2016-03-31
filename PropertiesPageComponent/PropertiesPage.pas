@@ -266,7 +266,7 @@ begin
   inherited Create(AOwner);
 
   FAutoCalcSep := False;
-  
+
   ItemHeight := 20;
   Color := clBtnFace;
   Style := lbOwnerDrawFixed;
@@ -744,6 +744,10 @@ begin
 end;
 
 procedure TPropertiesPage.KeyDown(var Key: Word; Shift: TShiftState);
+var
+  PPED: PPropEditData;
+  TempIndex: Integer;
+
 begin
   If (Key = VK_RETURN) or (Key = VK_SPACE) then
   begin
@@ -751,6 +755,26 @@ begin
     Key := 0;
     Exit;
   end;
+
+  if(Key = VK_UP) then
+  begin
+    TempIndex := ItemIndex - 1;
+    if(TempIndex >= 0) then
+    begin
+      PPED := Pointer(Items.Objects[TempIndex]);
+      FOnDetailsCallback(PPED^.Name, PPED^.Description);
+    end;
+  end
+  else if(Key = VK_DOWN) then
+  begin
+    TempIndex := ItemIndex + 1;
+    if(TempIndex < Items.Count) then
+    begin
+      PPED := Pointer(Items.Objects[TempIndex]);
+      FOnDetailsCallback(PPED^.Name, PPED^.Description);
+    end;
+  end;
+
   if not (Key in [VK_UP, VK_DOWN, VK_PRIOR, VK_NEXT]) then
   begin
     EdControl.left := EditRect.left;
