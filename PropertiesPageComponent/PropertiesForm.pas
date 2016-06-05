@@ -182,36 +182,36 @@ begin
   ProjectProperties.CreateItem(Category);
 
   Item.Kind := peItem;
-  Item.Name := 'Output (/o)';
-  Item.Description := 'Output files to specified path (overrides OutputDir): /o<path>.';
+  Item.Name := 'Output (/O)';
+  Item.Description := 'Output files to specified path (overrides OutputDir): /O<path>.';
   Item.XmlTag := 'CompilerOutput';
   Item.Default := '';
   Item.Possible := '';
-  Item.Strip := '/o';
+  Item.Strip := '/O';
   Item.Typ := piString;
   Item.Value := StripSymbol(Item.Strip, GetXmlStringValue(Item.XmlTag, Item.Default));
   Item.AddSpace := True;
   ProjectProperties.CreateItem(Item);
 
   Item.Kind := peItem;
-  Item.Name := 'OutputBaseFilename (/f)';
-  Item.Description := 'Override OutputBaseFilename with the specified filename: /f<filename>.';
+  Item.Name := 'OutputBaseFilename (/F)';
+  Item.Description := 'Overrides OutputBaseFilename with the specified filename: /F<filename>.';
   Item.XmlTag := 'CompilerBaseFileName';
   Item.Default := '';
   Item.Possible := '';
-  Item.Strip := '/f';
+  Item.Strip := '/F';
   Item.Typ := piString;
   Item.Value := StripSymbol(Item.Strip, GetXmlStringValue(Item.XmlTag, Item.Default));
   Item.AddSpace := True;
   ProjectProperties.CreateItem(Item);
 
   Item.Kind := peItem;
-  Item.Name := 'SignTool (/s)';
-  Item.Description := 'Set a SignTool with the specified name and command: /s<name>=<command>.';
+  Item.Name := 'SignTool (/S)';
+  Item.Description := 'Sets a SignTool with the specified name and command: /S<name>=<command>.';
   Item.XmlTag := 'CompilerSignTool';
   Item.Default := '';
   Item.Possible := '';
-  Item.Strip := '/s';
+  Item.Strip := '/S';
   Item.Typ := piString;
   Item.Value := StripSymbol(Item.Strip, GetXmlStringValue(Item.XmlTag, Item.Default));
   Item.AddSpace := True;
@@ -223,12 +223,12 @@ begin
   ProjectProperties.CreateItem(Category);
 
   Item.Kind := peItem;
-  Item.Name := 'Symbol (/d)';
-  Item.Description := 'Emulate a #define directive: /d<name>[=<value>]   #define public <name> <value>.';
+  Item.Name := 'Symbol (/D)';
+  Item.Description := 'Emulate #define public <name> <value>  /D<name>[=<value>].';
   Item.XmlTag := 'DirectivesSymbol';
   Item.Default := '';
   Item.Possible := '';
-  Item.Strip := '/d';
+  Item.Strip := '/D';
   Item.Typ := piString;
   Item.Value := StripSymbol(Item.Strip, GetXmlStringValue(Item.XmlTag, Item.Default));
   Item.AddSpace := True;
@@ -236,7 +236,7 @@ begin
 
   Item.Kind := peItem;
   Item.Name := 'Option (/$)';
-  Item.Description := 'Emulate a #pragma directive: /$<letter>(+|-)   #pragma option -<letter>(+|-).';
+  Item.Description := 'Emulate #pragma option -<letter>(+|-)  /$<letter>(+|-).';
   Item.XmlTag := 'DirectivesOption';
   Item.Default := '';
   Item.Possible := '';
@@ -247,24 +247,36 @@ begin
   ProjectProperties.CreateItem(Item);
 
   Item.Kind := peItem;
-  Item.Name := 'Parse Option (/p)';
-  Item.Description := 'Emulate a #pragma directive: /p<letter>(+|-)   #pragma parseroption -<letter>(+|-).';
+  Item.Name := 'Parse Option (/P)';
+  Item.Description := 'Emulate #pragma parseroption -<letter>(+|-)  /P<letter>(+|-).';
   Item.XmlTag := 'DirectivesParseOption';
   Item.Default := '';
   Item.Possible := '';
-  Item.Strip := '/p';
+  Item.Strip := '/P';
   Item.Typ := piString;
   Item.Value := StripSymbol(Item.Strip, GetXmlStringValue(Item.XmlTag, Item.Default));
   Item.AddSpace := True;
   ProjectProperties.CreateItem(Item);
 
   Item.Kind := peItem;
-  Item.Name := 'Include (/i)';
-  Item.Description := 'Emulate a #pragma directive: /i<paths>    #pragma include <paths>.';
+  Item.Name := 'Include (/I)';
+  Item.Description := 'Emulate #pragma include <paths>  /I<paths>.';
   Item.XmlTag := 'DirectivesInclude';
   Item.Default := '';
   Item.Possible := '';
-  Item.Strip := '/i';
+  Item.Strip := '/I';
+  Item.Typ := piString;
+  Item.Value := StripSymbol(Item.Strip, GetXmlStringValue(Item.XmlTag, Item.Default));
+  Item.AddSpace := True;
+  ProjectProperties.CreateItem(Item);
+
+  Item.Kind := peItem;
+  Item.Name := 'Include File (/J)';
+  Item.Description := 'Emulate #include <filename>  /J<filename>.';
+  Item.XmlTag := 'DirectivesIncludeFile';
+  Item.Default := '';
+  Item.Possible := '';
+  Item.Strip := '/J';
   Item.Typ := piString;
   Item.Value := StripSymbol(Item.Strip, GetXmlStringValue(Item.XmlTag, Item.Default));
   Item.AddSpace := True;
@@ -272,7 +284,7 @@ begin
 
   Item.Kind := peItem;
   Item.Name := 'Inline Start (/{#)';
-  Item.Description := 'Emulate a #pragma directive: /{#<string>   #pragma inlinestart <string>.';
+  Item.Description := 'Emulate #pragma inlinestart <string>  /{#<string>.';
   Item.XmlTag := 'DirectivesInlineStart';
   Item.Default := '';
   Item.Possible := '';
@@ -284,7 +296,7 @@ begin
 
   Item.Kind := peItem;
   Item.Name := 'Inline End (/})';
-  Item.Description := 'Emulate a #pragma directive: /}<string>   #pragma inlineend <string>.';
+  Item.Description := 'Emulate #pragma inlineend <string>  /}<string>.';
   Item.XmlTag := 'DirectivesInlineEnd';
   Item.Default := '';
   Item.Possible := '';
@@ -325,7 +337,7 @@ begin
 
   Item.Kind := peItem;
   Item.Name := 'Run installer';
-  Item.Description := 'Run generated installer after successful compilation.';
+  Item.Description := 'Run resulting installer after successful compilation.';
   Item.XmlTag := 'RunInstaller';
   Item.Default := 'No';
   Item.Possible := 'Yes|No';
@@ -395,6 +407,42 @@ begin
   Item.Value := GetXmlStringValue(Item.XmlTag, Item.Default);
   Item.AddSpace := True;
   ProjectProperties.CreateItem(Item);
+  
+  Item.Kind := peItem;
+  Item.Name := '/WX';
+  Item.Description := 'Treats warnings as errors.';
+  Item.XmlTag := 'CompilerWarningsX';
+  Item.Default := '';
+  Item.Possible := '|/WX';
+  Item.Strip := '';
+  Item.Typ := piCombo;
+  Item.Value := GetXmlStringValue(Item.XmlTag, Item.Default);
+  Item.AddSpace := True;
+  ProjectProperties.CreateItem(Item);
+
+  Item.Kind := peItem;
+  Item.Name := '/PPO';
+  Item.Description := 'Runs only the preprocessor (Prints the result to Output Window).';
+  Item.XmlTag := 'CompilerPPO';
+  Item.Default := '';
+  Item.Possible := '|/PPO';
+  Item.Strip := '';
+  Item.Typ := piCombo;
+  Item.Value := GetXmlStringValue(Item.XmlTag, Item.Default);
+  Item.AddSpace := True;
+  ProjectProperties.CreateItem(Item);
+
+  Item.Kind := peItem;
+  Item.Name := '/SAFEPPO';
+  Item.Description := 'Runs only the preprocessor (Prints the result to Output Window). The safe version will not execute instructions like !appendfile or !system. !packhdr and !finalize are never executed.';
+  Item.XmlTag := 'CompilerSafePPO';
+  Item.Default := '';
+  Item.Possible := '|/SAFEPPO';
+  Item.Strip := '';
+  Item.Typ := piCombo;
+  Item.Value := GetXmlStringValue(Item.XmlTag, Item.Default);
+  Item.AddSpace := True;
+  ProjectProperties.CreateItem(Item);  
 
   //////////////////////////////////////////////////////////////////////////////
   Category.Kind := peCategory;
@@ -456,7 +504,7 @@ begin
 
   Item.Kind := peItem;
   Item.Name := 'Run installer';
-  Item.Description := 'Run generated installer after successful compilation.';
+  Item.Description := 'Run resulting installer after successful compilation.';
   Item.XmlTag := 'RunInstaller';
   Item.Default := 'Yes';
   Item.Possible := 'Yes|No';
