@@ -64,12 +64,15 @@ uses
 
 procedure TPropForm.ButtonCancelClick(Sender: TObject);
 begin
+  // Ignore all changes
+  //ProjectProperties.Modified := False; 
   Close;
 end;
 
 procedure TPropForm.ButtonHelpClick(Sender: TObject);
 begin
   // Show help
+  ShellExecute(0, 'OPEN', PChar('http://www.rad-installer.com/features.html#project-properties'), '', '', SW_SHOWNORMAL);
 end;
 
 procedure TPropForm.ButtonOKClick(Sender: TObject);
@@ -108,7 +111,8 @@ begin
   end;
 {$ENDIF}
 
-  SaveProjectXml;
+  //if(ProjectProperties.Modified) then
+    SaveProjectXml;
   ProjectProperties.Modified := False;
   Close;
 end;
@@ -310,6 +314,18 @@ begin
   Category.Kind := peCategory;
   Category.Name := 'General';
   ProjectProperties.CreateItem(Category);
+  
+  Item.Kind := peItem;
+  Item.Name := 'Run installer';
+  Item.Description := 'Run resulting installer after successful compilation.';
+  Item.XmlTag := 'RunInstaller';
+  Item.Default := 'Yes';
+  Item.Possible := 'Yes|No';
+  Item.Strip := '';
+  Item.Typ := piCombo;
+  Item.Value := GetXmlStringValue(Item.XmlTag, Item.Default);
+  Item.AddSpace := False;
+  ProjectProperties.CreateItem(Item);
 
   Item.Kind := peItem;
   Item.Name := 'Launch tool before build';
@@ -331,18 +347,6 @@ begin
   Item.Possible := '';
   Item.Strip := '';
   Item.Typ := piString;
-  Item.Value := GetXmlStringValue(Item.XmlTag, Item.Default);
-  Item.AddSpace := False;
-  ProjectProperties.CreateItem(Item);
-
-  Item.Kind := peItem;
-  Item.Name := 'Run installer';
-  Item.Description := 'Run resulting installer after successful compilation.';
-  Item.XmlTag := 'RunInstaller';
-  Item.Default := 'No';
-  Item.Possible := 'Yes|No';
-  Item.Strip := '';
-  Item.Typ := piCombo;
   Item.Value := GetXmlStringValue(Item.XmlTag, Item.Default);
   Item.AddSpace := False;
   ProjectProperties.CreateItem(Item);
@@ -477,6 +481,18 @@ begin
   Category.Kind := peCategory;
   Category.Name := 'General';
   ProjectProperties.CreateItem(Category);
+  
+  Item.Kind := peItem;
+  Item.Name := 'Run installer';
+  Item.Description := 'Run resulting installer after successful compilation.';
+  Item.XmlTag := 'RunInstaller';
+  Item.Default := 'Yes';
+  Item.Possible := 'Yes|No';
+  Item.Strip := '';
+  Item.Typ := piCombo;
+  Item.Value := GetXmlStringValue(Item.XmlTag, Item.Default);
+  Item.AddSpace := False;
+  ProjectProperties.CreateItem(Item);  
 
   Item.Kind := peItem;
   Item.Name := 'Launch tool before build';
@@ -498,18 +514,6 @@ begin
   Item.Possible := '';
   Item.Strip := '';
   Item.Typ := piString;
-  Item.Value := GetXmlStringValue(Item.XmlTag, Item.Default);
-  Item.AddSpace := False;
-  ProjectProperties.CreateItem(Item);
-
-  Item.Kind := peItem;
-  Item.Name := 'Run installer';
-  Item.Description := 'Run resulting installer after successful compilation.';
-  Item.XmlTag := 'RunInstaller';
-  Item.Default := 'Yes';
-  Item.Possible := 'Yes|No';
-  Item.Strip := '';
-  Item.Typ := piCombo;
   Item.Value := GetXmlStringValue(Item.XmlTag, Item.Default);
   Item.AddSpace := False;
   ProjectProperties.CreateItem(Item);

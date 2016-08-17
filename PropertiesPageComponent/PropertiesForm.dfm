@@ -621,6 +621,7 @@ object PropForm: TPropForm
     Top = 455
     Width = 83
     Height = 25
+    Cancel = True
     Caption = '&Cancel'
     ModalResult = 2
     TabOrder = 4
@@ -632,7 +633,6 @@ object PropForm: TPropForm
     Width = 83
     Height = 25
     Caption = '&Help'
-    ModalResult = 9
     TabOrder = 3
     OnClick = ButtonHelpClick
   end

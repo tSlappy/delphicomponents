@@ -155,6 +155,9 @@ procedure Register;
 
 implementation
 
+uses
+  ShellAPI;
+
 function StringUtils_SplitString(const StringToSplit: String; const Delimiter: Char): TStrings;
 var
   ListOfStrings: TStrings;
@@ -346,7 +349,11 @@ begin
     PPED^.Kind := AItem.Kind;
 
     if(AItem.Kind = peCategory) then
-      PPED^.ChildShowing := True
+    begin
+      PPED^.ChildShowing := True;
+      AItem.Description := ' ';
+      PPED^.Description := Copy(AItem.Description, 1, Length(AItem.Description));
+    end
     else
     begin
       PPED^.Description := Copy(AItem.Description, 1, Length(AItem.Description));
@@ -773,6 +780,13 @@ begin
       PPED := Pointer(Items.Objects[TempIndex]);
       FOnDetailsCallback(PPED^.Name, PPED^.Description);
     end;
+  end;
+  
+  If (Key = VK_F1) then
+  begin
+    ShellExecute(0, 'OPEN', PChar('http://www.rad-installer.com/features.html#project-properties'), '', '', SW_SHOWNORMAL);
+    Key := 0;
+    Exit;
   end;
 
   if not (Key in [VK_UP, VK_DOWN, VK_PRIOR, VK_NEXT]) then
