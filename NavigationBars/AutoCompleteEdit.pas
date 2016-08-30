@@ -245,6 +245,10 @@ begin
 
   FCanvas := TControlCanvas.Create;
   TControlCanvas(FCanvas).Control := Self;
+  FCanvas.Font.Name := 'Arial';
+  FCanvas.Font.Size := FCanvas.Font.Size + 1;
+  Font.Name := 'Arial';
+  Font.Size := Font.Size + 1;
 
   // Create images for items
   BitmapI := TBitmap.Create;
@@ -416,9 +420,12 @@ end;
 
 procedure TAutoCompleteEdit.RegainFocus;
 begin
-  Self.SetFocus;
-  Self.SelStart := 0;
-  Self.SelLength := Length(Self.Text);
+  try
+    Self.SetFocus;
+    Self.SelStart := 0;
+    Self.SelLength := Length(Self.Text);
+  except
+  end;
 end;
 
 procedure TAutoCompleteEdit.ShowMembersList(AMembers: TList<TDropDownMember>);
@@ -538,14 +545,13 @@ end;
 procedure TAutoCompleteEdit.Paint;
 var
  Rect, TempRect: TRect;
- I: Integer;
- S: String;
 
 begin
   Rect := ClientRect;
   Canvas.FillRect(Rect);
   TempRect := Rect;
   TempRect.Left := Rect.Left + (2 * coImagePadding) + coImageWidth;
+  Canvas.Font.Style := Canvas.Font.Style - [fsBold, fsItalic, fsUnderline];
 
   if(FSelected <> nil) then
   begin
@@ -567,10 +573,7 @@ begin
   end
   else
   begin
-    Canvas.Font.Style := Canvas.Font.Style - [fsBold, fsItalic, fsUnderline];
-
     DrawTransparentBmp(Canvas, Rect.Left + coImagePadding, Rect.Top + coImagePadding, FBitmapsInnoSetup[19], clFuchsia);
-
     Canvas.TextOut(Rect.Left, Rect.Top, Self.Text);
   end;
 end;
