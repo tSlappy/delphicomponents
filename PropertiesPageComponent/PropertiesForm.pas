@@ -58,7 +58,7 @@ var
 implementation
 
 uses
-  UtilityFunctions {$IFDEF TOOLSAPI_BUILD}, ToolsAPI {$ENDIF};
+  UtilityFunctions {$IFDEF TOOLSAPI_BUILD}, ToolsAPI {$ENDIF}, ShellAPI;
 
 {$R *.DFM}
 

@@ -589,9 +589,9 @@ object PropForm: TPropForm
     Style = csDropDownList
     ItemIndex = 0
     TabOrder = 0
-    Text = 'Win32  (32-bit Windows)'
+    Text = 'Windows x86/x64 (32 bit and 64 bit)'
     Items.Strings = (
-      'Win32  (32-bit Windows)')
+      'Windows x86/x64 (32 bit and 64 bit)')
   end
   object ComboBoxConfiguration: TComboBox
     Left = 352
