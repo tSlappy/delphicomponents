@@ -12,7 +12,7 @@ uses
 type
   TPropForm = class(TForm)
     LabelTarget: TLabel;
-    ComboBoxTarget: TComboBox;
+    ComboBoxPlatform: TComboBox;
     LabelConfiguration: TLabel;
     ComboBoxConfiguration: TComboBox;
     ShapeDetails: TShape;
@@ -28,6 +28,7 @@ type
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure ButtonCancelClick(Sender: TObject);
     procedure ButtonHelpClick(Sender: TObject);
+    procedure ComboBoxPlatformChange(Sender: TObject);
 
   private
     { Private-Deklarationen }
@@ -35,6 +36,7 @@ type
     isInnoSetup: Boolean;
     projPath: String;
     projConfiguration: String;
+    projPlatform: String;
     currentConfigurationNode: IXMLDOMNode;
 
     function PutSymbol(Symbol, Text: String; Sep: Char): String;
@@ -42,7 +44,7 @@ type
 
   public
     { Public-Deklarationen }
-    procedure InitializeProject(innoSetup: Boolean; Path, Configuration: String);
+    procedure InitializeProject(innoSetup: Boolean; Path, setConfiguration, setPlatform: String);
     function LoadProjectXml: Boolean;
     function SaveProjectXml: Boolean;
     procedure InitInnoprojProperties;
@@ -106,6 +108,17 @@ begin
         node.text := projConfiguration;
         break;
       end;
+
+      // Find appropriate element and get it's value                             vvvvv
+      { <Project><PropertyGroup><Configuration Condition=" '$(Platform)' == '' ">Win32</Configuration> }
+      node := xmlDoc.selectSingleNode('/Project/PropertyGroup/Configuration');
+      if ((node.attributes.length > 0) and (StringUtils_Contains_IC(String(node.attributes.getNamedItem('Condition').Text), '$(Platform)'))) then
+      begin
+        // Change current platform
+        node.text := projPlatform;
+        break;
+      end;
+
       break;
     end;
   end;
@@ -120,6 +133,38 @@ end;
 procedure TPropForm.ComboBoxConfigurationChange(Sender: TObject);
 begin
   projConfiguration := ComboBoxConfiguration.Items[ComboBoxConfiguration.ItemIndex];
+
+  if(ProjectProperties.Modified) then
+    if (MessageDlg('Project Properties were changed. Do you want to save changes?', mtWarning, [mbYes, mbNo], 0) = mrYes) then
+      SaveProjectXml
+    else
+      ProjectProperties.Modified := False;
+
+  // Load Project (.innoproj or .nsisproj)
+  if (not LoadProjectXml) then
+    MessageDlg('Cannot load Project Properties from file! Default values will be used!', mtWarning, [mbOK], 0);
+
+  if(isInnoSetup) then
+  begin
+    InitInnoprojProperties;
+    Caption := 'Inno Setup Project Properties';
+  end
+  else
+  begin
+    InitNsisprojProperties;
+    Caption := 'NSIS Project Properties';
+  end;
+
+  LabelDetails.Caption := '';
+  LabelDescription.Caption := '';
+end;
+
+procedure TPropForm.ComboBoxPlatformChange(Sender: TObject);
+begin
+  if(ComboBoxPlatform.ItemIndex = 0) then
+    projPlatform := 'Win32'
+  else if(ComboBoxPlatform.ItemIndex = 1) then
+    projPlatform := 'Win64';
 
   if(ProjectProperties.Modified) then
     if (MessageDlg('Project Properties were changed. Do you want to save changes?', mtWarning, [mbYes, mbNo], 0) = mrYes) then
@@ -532,17 +577,19 @@ begin
     xmlDoc := nil;
     currentConfigurationNode := nil;
     xmlDoc := CreateOleObject('Microsoft.XMLDOM') as IXMLDOMDocument2;
+    xmlDoc.validateOnParse := True;
+    xmlDoc.preserveWhiteSpace := True;
     xmlDoc.async := False;
     xmlDoc.load(projPath);
     if (xmlDoc.parseError.errorCode <> 0) then
     begin
       xmlDoc := nil;
       currentConfigurationNode := nil;
-      raise Exception.Create('Cannot not load Project file! Details: ' + xmlDoc.parseError.reason);
+      raise Exception.Create('Cannot load Project file! Details: ' + xmlDoc.parseError.reason);
     end;
 
-    // Find appropriate element and get it's value
-    { <?xml><Project><PropertyGroup Condition=" '$(Configuration)' == 'XXX' "> }
+    // Find appropriate element and get its value
+    { <?xml><Project><PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'CFG|PLRM' "> }
     propertyGroup := xmlDoc.selectNodes('/Project/PropertyGroup');
     for I := 0 to propertyGroup.length - 1 do
     begin
@@ -552,9 +599,12 @@ begin
         Temp := String(node.attributes.getNamedItem('Condition').Text);
         if(StringUtils_Contains_IC(Temp, '$(Configuration)') and StringUtils_Contains_IC(Temp, projConfiguration)) then
         begin
-          // Do all operations on this node
-          currentConfigurationNode := propertyGroup[I];
-          break;
+          if(StringUtils_Contains_IC(Temp, '$(Platform)') and StringUtils_Contains_IC(Temp, projPlatform)) then
+          begin
+            // Do all operations on this node
+            currentConfigurationNode := propertyGroup[I];
+            break;
+          end;
         end;
       end;
     end;
@@ -571,11 +621,37 @@ var
   I: Integer;
   PPED: PPropEditData;
   node: IXMLDOMNode;
-  elementNode: IXMLDOMNode;
+  elementNode, projectNode, propertyGroupNode, firstChild: IXMLDomNode;
+  attribute: IXMLDOMAttribute;
   Ch: Char;
+  xmlOutDoc, xlsStyleDoc: IXMLDOMDocument2;
+  sXslStyleSheet: String;
 
 begin
   try
+    // If the Configuration/Platform does not exist, create this node
+    if((xmlDoc <> nil) and (currentConfigurationNode = nil)) then
+    begin
+      xmlDoc.preserveWhiteSpace := True;
+      firstChild := xmlDoc.selectNodes('/Project/ItemGroup')[0];
+      projectNode := xmlDoc.selectSingleNode('/Project');
+
+      if ((firstChild <> nil) and (projectNode <> nil)) then
+        begin
+          propertyGroupNode := projectNode.insertBefore(xmlDoc.createNode(NODE_ELEMENT, 'PropertyGroup', 'http://schemas.microsoft.com/developer/msbuild/2003'), firstChild);
+          if(propertyGroupNode <> nil) then
+          begin
+            // Set Configuration/Platform attribute
+            attribute := xmlDoc.createAttribute('Condition');
+            attribute.text := ' "$(Configuration)|$(Platform)" == "' + projConfiguration + '|' + projPlatform + '" ';
+            attribute.text := StringReplace(attribute.text, '"', '''', [rfReplaceAll, rfIgnoreCase]);
+
+            propertyGroupNode.attributes.setNamedItem(attribute);
+            currentConfigurationNode := propertyGroupNode;
+          end;
+        end;
+    end;
+
     // Save the Project (.innoproj or .nsisproj file)
     if((xmlDoc <> nil) and (currentConfigurationNode <> nil)) then
     begin
@@ -611,7 +687,30 @@ begin
           end;
       end;
 
-      xmlDoc.save(projPath);
+     { TO-DO: sXslStyleSheet := '<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">' +
+                        '<xsl:output method="xml" indent="yes"/>' +
+                        '<xsl:template match="@* | node()">' +
+                        '<xsl:copy>' +
+                        '<xsl:apply-templates select="@* | node()"/>' +
+                        '</xsl:copy>' +
+                        '</xsl:template>' +
+                        '</xsl:stylesheet>';
+
+      xlsStyleDoc := CreateOleObject('Microsoft.XMLDOM') as IXMLDOMDocument2;
+      xlsStyleDoc.preserveWhiteSpace := True;
+      xlsStyleDoc.async := False;
+      xlsStyleDoc.loadXML(sXslStyleSheet);
+      if (xlsStyleDoc.parseError.errorCode = 0) then
+      begin
+        xmlOutDoc := CreateOleObject('Microsoft.XMLDOM') as IXMLDOMDocument2;
+        xmlOutDoc.preserveWhiteSpace := True;
+        xmlOutDoc.async := False;
+        xmlOutDoc.validateOnParse := True;
+        xmlDoc.transformNodeToObject(xlsStyleDoc, xmlOutDoc);
+        xmlOutDoc.save(projPath);
+      end
+      else  }
+        xmlDoc.save(projPath);
       Result := True;
     end;
   except
@@ -626,14 +725,28 @@ begin
   LabelDescription.Caption := Desc;
 end;
 
-procedure TPropForm.InitializeProject(innoSetup: Boolean; Path, Configuration: String);
+procedure TPropForm.InitializeProject(innoSetup: Boolean; Path, setConfiguration, setPlatform: String);
 begin
   isInnoSetup := innoSetup;
   projPath := Path;
 
-  if((Configuration <> 'Debug') and (Configuration <> 'Release')) then
-    Configuration := 'Debug';
-  projConfiguration := Configuration;
+  if((setConfiguration <> 'Debug') and (setConfiguration <> 'Release')) then
+    setConfiguration := 'Debug';
+  projConfiguration := setConfiguration;
+
+  if(projConfiguration = 'Debug') then
+    ComboBoxConfiguration.ItemIndex := 0
+  else if(projConfiguration = 'Release') then
+    ComboBoxConfiguration.ItemIndex := 1;
+
+  if((setPlatform <> 'Win32') and (setPlatform <> 'Win64')) then
+    setPlatform := 'Win32';
+  projPlatform := setPlatform;
+
+  if(projPlatform = 'Win32') then
+    ComboBoxPlatform.ItemIndex := 0
+  else if(projPlatform = 'Win64') then
+    ComboBoxPlatform.ItemIndex := 1;
 
   // Load Project (.innoproj or .nsisproj)
   if (not LoadProjectXml) then
@@ -649,11 +762,6 @@ begin
     InitNsisprojProperties;
     Caption := 'NSIS Project Properties';
   end;
-
-  if(projConfiguration = 'Release') then
-    ComboBoxConfiguration.ItemIndex := 1
-  else
-    ComboBoxConfiguration.ItemIndex := 0;
 
   ProjectProperties.OnDetailsCallback := OnItemDetails;
 end;

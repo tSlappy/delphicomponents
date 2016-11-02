@@ -34,14 +34,14 @@ implementation
 procedure TFormTest.Button1Click(Sender: TObject);
 begin
   PropForm := TPropForm.Create(Self);
-  PropForm.InitializeProject(True, 'InnoSetup.innoproj', 'Debug');
+  PropForm.InitializeProject(True, 'InnoSetup.innoproj', 'Debug', 'Win32');
   PropForm.ShowModal;
 end;
 
 procedure TFormTest.Button2Click(Sender: TObject);
 begin
   PropForm := TPropForm.Create(Self);
-  PropForm.InitializeProject(False, 'NSIS.nsisproj', 'Release');
+  PropForm.InitializeProject(False, 'NSIS.nsisproj', 'Release', 'Win32');
   PropForm.ShowModal;
 end;
 

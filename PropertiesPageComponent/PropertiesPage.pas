@@ -320,8 +320,12 @@ procedure TPropertiesPage.FreeMemory;
 var
   i: Integer;
 begin
-  for i := 0 to Items.Count - 1 do
-    FreeMem(Pointer(Items.Objects[i]), SizeOf(TPropEditData));
+  try
+    for i := 0 to Items.Count - 1 do
+      FreeMem(Pointer(Items.Objects[i]), SizeOf(TPropEditData));
+  except
+    // Exception
+  end;
 end;
 
 procedure TPropertiesPage.SetAutoCalcSep(Value: Boolean);
@@ -692,10 +696,12 @@ Var
 begin
   If SplitDrag then
   Begin
-    If X > ClientWidth - 20 then
-      X := ClientWidth - 20;
-    If X < 20 then
-      X := 20;
+    // Left and Right minimum widths
+    If X > ClientWidth - 100 then
+      X := ClientWidth - 100;
+    If X < 100 then
+      X := 100;
+      
     If Halfway < x then
     Begin
       TempR.Left := Halfway;
